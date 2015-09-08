@@ -12,83 +12,39 @@ import org.json.JSONObject;
 
 public class JsonInput {
 	/**
-	 * Parses required item list.
-	 * 
+	 * Returns a json array as "not-null" value.
+	 *
 	 * @param obj
-	 *            object to extract a list from.
+	 *            object to get a value from.
 	 * @param field
-	 *            field to parse.
-	 * @param parser
-	 *            single item parser.
-	 * @return parsed objects.
-	 * @throws JSONException
-	 *             if format is invalid.
+	 *            field to get a value from.
+	 * @return json array.
 	 */
-	public static <T> List<T> getListNotNull(JSONObject obj, String field,
-			JsonObjectParser<T> parser) throws JSONException {
-		final JSONArray items = getArrayNotNull(obj, field);
-		final int length = items.length();
-		final List<T> result = new ArrayList<T>(length);
-		for (int i = 0; i < length; i++)
-			result.add(parser.parse(items.getJSONObject(i)));
-		return result;
+	public static JSONArray getArrayNotNull(final JSONObject obj, final String field)
+			throws JSONException {
+		return obj.getJSONArray(field);
 	}
 
 	/**
-	 * Parses optional item list.
-	 * 
+	 * Returns a json array as "not-null" value.
+	 *
 	 * @param obj
-	 *            object to extract a list from.
+	 *            object to get a value from.
 	 * @param field
-	 *            field to parse.
-	 * @param parser
-	 *            single item parser.
-	 * @return parsed objects.
-	 * @throws JSONException
-	 *             if format is invalid.
+	 *            field to get a value from.
+	 * @return json array.
 	 */
-	public static <T> List<T> getListOrNull(JSONObject obj, String field,
-			JsonObjectParser<T> parser) throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
+	public static JSONArray getArrayOrNull(final JSONObject obj, final String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field)) {
 			return null;
-		final JSONArray items = obj.getJSONArray(field);
-		final int length = items.length();
-		final List<T> result = new ArrayList<T>(length);
-		for (int i = 0; i < length; i++)
-			result.add(parser.parse(items.getJSONObject(i)));
-		return result;
-	}
-
-	/**
-	 * Parses optional item list.
-	 * 
-	 * @param obj
-	 *            object to extract a list from.
-	 * @param field
-	 *            field to parse.
-	 * @param parser
-	 *            single item parser.
-	 * @return parsed objects.
-	 * @throws JSONException
-	 *             if format is invalid.
-	 */
-	public static <T> List<T> getListOrEmpty(JSONObject obj, String field,
-			JsonObjectParser<T> parser) throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
-			return new ArrayList<T>();
-		final JSONArray items = obj.getJSONArray(field);
-		if (items == null)
-			return new ArrayList<T>();
-		final int length = items.length();
-		final List<T> result = new ArrayList<T>(length);
-		for (int i = 0; i < length; i++)
-			result.add(parser.parse(items.getJSONObject(i)));
-		return result;
+		}
+		return obj.getJSONArray(field);
 	}
 
 	/**
 	 * Fetch a date or null.
-	 * 
+	 *
 	 * @param obj
 	 *            object to get.
 	 * @param field
@@ -99,91 +55,40 @@ public class JsonInput {
 	 * @throws JSONException
 	 *             if error occurs.
 	 */
-	public static Date getDateOrNull(JSONObject obj, String field,
+	public static Date getDateOrNull(final JSONObject obj, final String field,
 			final SimpleDateFormat dateFormat) throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
+		if (!obj.has(field) || obj.isNull(field)) {
 			return null;
+		}
 		final String guess = obj.getString(field);
 		try {
 			return dateFormat.parse(guess);
-		} catch (ParseException e) {
-			throw new JSONException("Bad date value " + guess);
+		} catch (final ParseException e) {
+			throw new JSONException("Bad date value " + guess + " " + e.getMessage());
 		}
 	}
 
 	/**
-	 * Fetches an optional string from an object.
-	 * 
+	 * Fetches an optional float from an object.
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
 	 * @throws JSONException
-	 *             if value is not valid
+	 *             if value is not valid, not exists, etc...
 	 */
-	public static String getStringOrNull(JSONObject obj, String field)
-			throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
-			return null;
-		return obj.getString(field);
-	}
-    
-	/**
-	 * Returns an optional "boolean" field value. If field is absent or set to
-	 * <code>null</code>, this method returns <code>false</code>.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value for.
-	 * @return boolean value.
-	 * @throws JSONException
-	 *             if input is not valid (field value is not boolean).
-	 */
-	public static boolean getOptionalBool(JSONObject obj, String field)
+	public static Float getFloatOrNull(final JSONObject obj, final String field)
 			throws JSONException {
 		if (!obj.has(field) || obj.isNull(field)) {
-			return false;
+			return null;
 		}
-		return obj.getBoolean(field);
-	}
-
-	/**
-	 * Fetches an optional string from an object. Absent value is returned as an
-	 * empty string instead of null.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value from.
-	 * @throws JSONException
-	 *             if value is not valid
-	 */
-	public static String getStringOrEmpty(JSONObject obj, String field)
-			throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
-			return "";
-		return obj.getString(field);
-	}
-
-	/**
-	 * Fetches a string from an object.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value from.
-	 * @throws JSONException
-	 *             if value is not valid, not exists, etc...
-	 */
-	public static String getStringNotNull(JSONObject obj, String field)
-			throws JSONException {
-		return obj.getString(field);
+		return (float) obj.getDouble(field);
 	}
 
 	/**
 	 * Fetches an int from an object.
-	 * 
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
@@ -191,13 +96,13 @@ public class JsonInput {
 	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static int getInt(JSONObject obj, String field) throws JSONException {
+	public static int getInt(final JSONObject obj, final String field) throws JSONException {
 		return obj.getInt(field);
 	}
-
+	
 	/**
 	 * Fetches an int from an object.
-	 * 
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
@@ -207,14 +112,14 @@ public class JsonInput {
 	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static int getInt(JSONObject obj, String field, int deflt)
+	public static int getInt(final JSONObject obj, final String field, final int deflt)
 			throws JSONException {
 		return obj.optInt(field, deflt);
 	}
 
 	/**
 	 * Fetches an optional int from an object.
-	 * 
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
@@ -222,16 +127,98 @@ public class JsonInput {
 	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static Integer getIntOrNull(JSONObject obj, String field)
+	public static Integer getIntOrNull(final JSONObject obj, final String field)
 			throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
+		if (!obj.has(field) || obj.isNull(field)) {
 			return null;
+		}
 		return obj.getInt(field);
 	}
 
 	/**
+	 * Parses required item list.
+	 *
+	 * @param obj
+	 *            object to extract a list from.
+	 * @param field
+	 *            field to parse.
+	 * @param parser
+	 *            single item parser.
+	 * @return parsed objects.
+	 * @throws JSONException
+	 *             if format is invalid.
+	 */
+	public static <T> List<T> getListNotNull(final JSONObject obj, final String field,
+			final JsonObjectParser<T> parser) throws JSONException {
+		final JSONArray items = getArrayNotNull(obj, field);
+		final int length = items.length();
+		final List<T> result = new ArrayList<T>(length);
+		for (int i = 0; i < length; i++) {
+			result.add(parser.parse(items.getJSONObject(i)));
+		}
+		return result;
+	}
+
+	/**
+	 * Parses optional item list.
+	 *
+	 * @param obj
+	 *            object to extract a list from.
+	 * @param field
+	 *            field to parse.
+	 * @param parser
+	 *            single item parser.
+	 * @return parsed objects.
+	 * @throws JSONException
+	 *             if format is invalid.
+	 */
+	public static <T> List<T> getListOrEmpty(final JSONObject obj, final String field,
+			final JsonObjectParser<T> parser) throws JSONException {
+		if (!obj.has(field) || obj.isNull(field)) {
+			return new ArrayList<T>();
+		}
+		final JSONArray items = obj.getJSONArray(field);
+		if (items == null) {
+			return new ArrayList<T>();
+		}
+		final int length = items.length();
+		final List<T> result = new ArrayList<T>(length);
+		for (int i = 0; i < length; i++) {
+			result.add(parser.parse(items.getJSONObject(i)));
+		}
+		return result;
+	}
+
+	/**
+	 * Parses optional item list.
+	 *
+	 * @param obj
+	 *            object to extract a list from.
+	 * @param field
+	 *            field to parse.
+	 * @param parser
+	 *            single item parser.
+	 * @return parsed objects.
+	 * @throws JSONException
+	 *             if format is invalid.
+	 */
+	public static <T> List<T> getListOrNull(final JSONObject obj, final String field,
+			final JsonObjectParser<T> parser) throws JSONException {
+		if (!obj.has(field) || obj.isNull(field)) {
+			return null;
+		}
+		final JSONArray items = obj.getJSONArray(field);
+		final int length = items.length();
+		final List<T> result = new ArrayList<T>(length);
+		for (int i = 0; i < length; i++) {
+			result.add(parser.parse(items.getJSONObject(i)));
+		}
+		return result;
+	}
+
+	/**
 	 * Fetches a long from an object.
-	 * 
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
@@ -239,14 +226,14 @@ public class JsonInput {
 	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static long getLong(JSONObject obj, String field)
+	public static long getLong(final JSONObject obj, final String field)
 			throws JSONException {
 		return obj.getLong(field);
 	}
 
 	/**
 	 * Fetches an optional long from an object.
-	 * 
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
@@ -254,33 +241,52 @@ public class JsonInput {
 	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static Long getLongOrNull(JSONObject obj, String field)
+	public static Long getLongOrNull(final JSONObject obj, final String field)
 			throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
+		if (!obj.has(field) || obj.isNull(field)) {
 			return null;
+		}
 		return obj.getLong(field);
 	}
 
 	/**
-	 * Fetches an optional float from an object.
-	 * 
+	 * Returns a json object field for a specified object.
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
-	 *            field to get a value from.
+	 *            returned field.
+	 * @return object field.
 	 * @throws JSONException
-	 *             if value is not valid, not exists, etc...
+	 *             if target field is not an object.
 	 */
-	public static Float getFloatOrNull(JSONObject obj, String field)
+	public static JSONObject getObjectNotNull(final JSONObject obj, final String field)
 			throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
+		return obj.getJSONObject(field);
+	}
+
+	/**
+	 * Returns a json object field for a specified object.
+	 *
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            returned field.
+	 * @return object field.
+	 * @throws JSONException
+	 *             if target field is not an object.
+	 */
+	public static JSONObject getObjectOrNull(final JSONObject obj, final String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field)) {
 			return null;
-		return (float) obj.getDouble(field);
+		}
+		return obj.getJSONObject(field);
 	}
 
 	/**
 	 * Retreive optional object.
-	 * 
+	 *
 	 * @param obj
 	 *            object to parse.
 	 * @param field
@@ -291,74 +297,83 @@ public class JsonInput {
 	 * @throws JSONException
 	 *             if value is not valid.
 	 */
-	public static <T> T getObjectOrNull(JSONObject obj, String field,
-			JsonObjectParser<T> parser) throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
+	public static <T> T getObjectOrNull(final JSONObject obj, final String field,
+			final JsonObjectParser<T> parser) throws JSONException {
+		if (!obj.has(field) || obj.isNull(field)) {
 			return null;
+		}
 		return parser.parse(obj.getJSONObject(field));
 	}
 
 	/**
-	 * Returns a json array as "not-null" value.
-	 * 
-	 * @param obj
-	 *            object to get a value from.
-	 * @param field
-	 *            field to get a value from.
-	 * @return json array.
-	 */
-	public static JSONArray getArrayOrNull(JSONObject obj, String field)
-			throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
-			return null;
-		return obj.getJSONArray(field);
-	}
-
-	/**
-	 * Returns a json array as "not-null" value.
-	 * 
-	 * @param obj
-	 *            object to get a value from.
-	 * @param field
-	 *            field to get a value from.
-	 * @return json array.
-	 */
-	public static JSONArray getArrayNotNull(JSONObject obj, String field)
-			throws JSONException {
-		return obj.getJSONArray(field);
-	}
-
-	/**
-	 * Returns a json object field for a specified object.
-	 * 
+	 * Returns an optional "boolean" field value. If field is absent or set to
+	 * <code>null</code>, this method returns <code>false</code>.
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
-	 *            returned field.
-	 * @return object field.
+	 *            field to get a value for.
+	 * @return boolean value.
 	 * @throws JSONException
-	 *             if target field is not an object.
+	 *             if input is not valid (field value is not boolean).
 	 */
-	public static JSONObject getObjectNotNull(JSONObject obj, String field)
+	public static boolean getOptionalBool(final JSONObject obj, final String field)
 			throws JSONException {
-		return obj.getJSONObject(field);
+		if (!obj.has(field) || obj.isNull(field)) {
+			return false;
+		}
+		return obj.getBoolean(field);
 	}
 
 	/**
-	 * Returns a json object field for a specified object.
-	 * 
+	 * Fetches a string from an object.
+	 *
 	 * @param obj
 	 *            object to get a field from.
 	 * @param field
-	 *            returned field.
-	 * @return object field.
+	 *            field to get a value from.
 	 * @throws JSONException
-	 *             if target field is not an object.
+	 *             if value is not valid, not exists, etc...
 	 */
-	public static JSONObject getObjectOrNull(JSONObject obj, String field)
+	public static String getStringNotNull(final JSONObject obj, final String field)
 			throws JSONException {
-		if (!obj.has(field) || obj.isNull(field))
+		return obj.getString(field);
+	}
+
+	/**
+	 * Fetches an optional string from an object. Absent value is returned as an
+	 * empty string instead of null.
+	 *
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value from.
+	 * @throws JSONException
+	 *             if value is not valid
+	 */
+	public static String getStringOrEmpty(final JSONObject obj, final String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field)) {
+			return "";
+		}
+		return obj.getString(field);
+	}
+
+	/**
+	 * Fetches an optional string from an object.
+	 *
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value from.
+	 * @throws JSONException
+	 *             if value is not valid
+	 */
+	public static String getStringOrNull(final JSONObject obj, final String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field)) {
 			return null;
-		return obj.getJSONObject(field);
+		}
+		return obj.getString(field);
 	}
 }

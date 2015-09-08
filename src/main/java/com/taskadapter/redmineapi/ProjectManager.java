@@ -1,15 +1,15 @@
 package com.taskadapter.redmineapi;
 
-import com.taskadapter.redmineapi.bean.News;
-import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.internal.Transport;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
+import com.taskadapter.redmineapi.bean.News;
+import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.Version;
 
 /**
  * Works with Projects and their Versions.
@@ -36,9 +36,9 @@ import java.util.Set;
  * @see RedmineManager#getIssueManager()
  */
 public class ProjectManager {
-    private final Transport transport;
+    private final ITransport transport;
 
-    ProjectManager(Transport transport) {
+    ProjectManager(final ITransport transport) {
         this.transport = transport;
     }
 
@@ -66,9 +66,96 @@ public class ProjectManager {
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      */
-    public Project createProject(Project project) throws RedmineException {
+    public Project createProject(final Project project) throws RedmineException {
         return transport.addObject(project, new BasicNameValuePair("include",
                 "trackers"));
+    }
+
+    /**
+     * creates a new {@link com.taskadapter.redmineapi.bean.Version} for the {@link Project} contained. <br>
+     * Pre-condition: the attribute {@link Project} for the {@link com.taskadapter.redmineapi.bean.Version} must
+     * not be null!
+     *
+     * @param version the {@link com.taskadapter.redmineapi.bean.Version}. Must contain a {@link Project}.
+     * @return the new {@link com.taskadapter.redmineapi.bean.Version} created by Redmine
+     * @throws IllegalArgumentException thrown in case the version does not contain a project.
+     * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
+     * @throws RedmineException         thrown in case something went wrong in Redmine
+     * @throws NotFoundException        thrown in case an object can not be found
+     */
+    public Version createVersion(final Version version) throws RedmineException {
+        // check project
+        if (version.getProject() == null
+                || version.getProject().getId() == null) {
+            throw new IllegalArgumentException(
+                    "Version must contain an existing project");
+        }
+        return transport.addChildEntry(Project.class, version.getProject()
+                .getId().toString(), version);
+    }
+
+    /**
+     * @param projectKey string key like "project-ABC", NOT a database numeric ID
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException       if the project with the given key is not found
+     * @throws RedmineException
+     */
+    public void deleteProject(final String projectKey) throws RedmineException {
+        transport.deleteObject(Project.class, projectKey);
+    }
+
+    /**
+     * deletes a new {@link Version} from the {@link Project} contained. <br>
+     *
+     * @param version the {@link Version}.
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws NotFoundException       thrown in case an object can not be found
+     */
+    public void deleteVersion(final Version version) throws RedmineException {
+        transport
+                .deleteObject(Version.class, Integer.toString(version.getId()));
+    }
+
+    /**
+     * @param projectKey ignored if NULL
+     * @return list of news objects
+     * @see com.taskadapter.redmineapi.bean.News
+     */
+    public List<News> getNews(final String projectKey) throws RedmineException {
+        final Set<NameValuePair> params = new HashSet<NameValuePair>();
+        if (projectKey != null && projectKey.length() > 0) {
+            params.add(new BasicNameValuePair("project_id", projectKey));
+        }
+        return transport.getObjectsList(News.class, params);
+    }
+
+    /**
+     * @param id project database Id, like 123. this is not a string "key" like "myproject".
+     *
+     * @return Redmine's project
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization.
+     * @throws NotFoundException       the project with the given id is not found
+     * @throws RedmineException
+     */
+    public Project getProjectById(final int id) throws RedmineException {
+        return transport.getObject(Project.class, id, new BasicNameValuePair("include", "trackers"));
+    }
+
+    /**
+     * @param projectKey string key like "project-ABC", NOT a database numeric ID
+     *
+     * @return Redmine's project
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException       the project with the given key is not found
+     * @throws RedmineException
+     */
+    public Project getProjectByKey(final String projectKey) throws RedmineException {
+        return transport.getObject(Project.class, projectKey,
+                new BasicNameValuePair("include", "trackers"));
     }
 
     /**
@@ -89,83 +176,14 @@ public class ProjectManager {
         try {
             return transport.getObjectsList(Project.class,
                     new BasicNameValuePair("include", "trackers"));
-        } catch (NotFoundException e) {
-            throw new RedmineInternalError("NotFoundException received, which should never happen in this request");
+        } catch (final NotFoundException e) {
+            throw new RedmineInternalError("NotFoundException received, which should never happen in this request", e);
         }
     }
 
-    /**
-     * @param projectKey string key like "project-ABC", NOT a database numeric ID
-     *
-     * @return Redmine's project
-     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws NotFoundException       the project with the given key is not found
-     * @throws RedmineException
-     */
-    public Project getProjectByKey(String projectKey) throws RedmineException {
-        return transport.getObject(Project.class, projectKey,
-                new BasicNameValuePair("include", "trackers"));
-    }
-
-    /**
-     * @param id project database Id, like 123. this is not a string "key" like "myproject".
-     *
-     * @return Redmine's project
-     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization.
-     * @throws NotFoundException       the project with the given id is not found
-     * @throws RedmineException
-     */
-    public Project getProjectById(int id) throws RedmineException {
-        return transport.getObject(Project.class, id, new BasicNameValuePair("include", "trackers"));
-    }
-
-    /**
-     * @param projectKey string key like "project-ABC", NOT a database numeric ID
-     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws NotFoundException       if the project with the given key is not found
-     * @throws RedmineException
-     */
-    public void deleteProject(String projectKey) throws RedmineException {
-        transport.deleteObject(Project.class, projectKey);
-    }
-
-    /**
-     * creates a new {@link com.taskadapter.redmineapi.bean.Version} for the {@link Project} contained. <br>
-     * Pre-condition: the attribute {@link Project} for the {@link com.taskadapter.redmineapi.bean.Version} must
-     * not be null!
-     *
-     * @param version the {@link com.taskadapter.redmineapi.bean.Version}. Must contain a {@link Project}.
-     * @return the new {@link com.taskadapter.redmineapi.bean.Version} created by Redmine
-     * @throws IllegalArgumentException thrown in case the version does not contain a project.
-     * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
-     * @throws RedmineException         thrown in case something went wrong in Redmine
-     * @throws NotFoundException        thrown in case an object can not be found
-     */
-    public Version createVersion(Version version) throws RedmineException {
-        // check project
-        if (version.getProject() == null
-                || version.getProject().getId() == null) {
-            throw new IllegalArgumentException(
-                    "Version must contain an existing project");
-        }
-        return transport.addChildEntry(Project.class, version.getProject()
-                .getId().toString(), version);
-    }
-
-    /**
-     * deletes a new {@link Version} from the {@link Project} contained. <br>
-     *
-     * @param version the {@link Version}.
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws RedmineException        thrown in case something went wrong in Redmine
-     * @throws NotFoundException       thrown in case an object can not be found
-     */
-    public void deleteVersion(Version version) throws RedmineException {
-        transport
-                .deleteObject(Version.class, Integer.toString(version.getId()));
+    // TODO add test
+    public Version getVersionById(final int versionId) throws RedmineException {
+        return transport.getObject(Version.class, versionId);
     }
 
     /**
@@ -177,34 +195,16 @@ public class ProjectManager {
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<Version> getVersions(int projectID) throws RedmineException {
+    public List<Version> getVersions(final int projectID) throws RedmineException {
         return transport.getChildEntries(Project.class,
                 Integer.toString(projectID), Version.class);
     }
 
-    // TODO add test
-    public Version getVersionById(int versionId) throws RedmineException {
-        return transport.getObject(Version.class, versionId);
-    }
-
-    public void update(Project object) throws RedmineException {
+    public void update(final Project object) throws RedmineException {
         transport.updateObject(object);
     }
 
-    public void update(Version object) throws RedmineException {
+    public void update(final Version object) throws RedmineException {
         transport.updateObject(object);
-    }
-
-    /**
-     * @param projectKey ignored if NULL
-     * @return list of news objects
-     * @see com.taskadapter.redmineapi.bean.News
-     */
-    public List<News> getNews(String projectKey) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
-        if ((projectKey != null) && (projectKey.length() > 0)) {
-            params.add(new BasicNameValuePair("project_id", projectKey));
-        }
-        return transport.getObjectsList(News.class, params);
     }
 }

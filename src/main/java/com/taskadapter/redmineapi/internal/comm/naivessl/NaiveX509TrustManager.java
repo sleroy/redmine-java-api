@@ -13,17 +13,19 @@ import javax.net.ssl.X509TrustManager;
  * @author Bartosz Firyn (SarXos)
  */
 public class NaiveX509TrustManager implements X509TrustManager {
-
-    @Override
-    public void checkClientTrusted(X509Certificate[] certs, String str) throws CertificateException {
-    }
-
-    @Override
-    public void checkServerTrusted(X509Certificate[] certs, String str) throws CertificateException {
-    }
-
-    @Override
-    public X509Certificate[] getAcceptedIssuers() {
-        return null;
-    }
+	
+	@Override
+	public void checkClientTrusted(final X509Certificate[] certs, final String str) throws CertificateException {
+		// Voluntary ignore
+	}
+	
+	@Override
+	public void checkServerTrusted(final X509Certificate[] certs, final String str) throws CertificateException {
+		// Voluntary ignore
+	}
+	
+	@Override
+	public X509Certificate[] getAcceptedIssuers() {
+		return null;
+	}
 }

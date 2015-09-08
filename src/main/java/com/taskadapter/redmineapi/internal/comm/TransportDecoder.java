@@ -11,7 +11,7 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineTransportException;
 
 /**
- * Transport encoding decoder.
+ * ITransport encoding decoder.
  * 
  * @author maxkar
  * 

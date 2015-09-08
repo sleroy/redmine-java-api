@@ -3,7 +3,7 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.WikiPage;
 import com.taskadapter.redmineapi.bean.WikiPageDetail;
-import com.taskadapter.redmineapi.internal.Transport;
+
 import org.apache.http.message.BasicNameValuePair;
 
 import java.util.List;
@@ -25,9 +25,9 @@ import java.util.List;
  * @see RedmineManager
  */
 public class WikiManager {
-    private final Transport transport;
+    private final ITransport transport;
 
-    WikiManager(Transport transport) {
+    WikiManager(ITransport transport) {
         this.transport = transport;
     }
 

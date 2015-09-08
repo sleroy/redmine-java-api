@@ -7,7 +7,6 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.UserFactory;
-import com.taskadapter.redmineapi.internal.Transport;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,9 +31,9 @@ import java.util.List;
  * @see RedmineManager
  */
 public class MembershipManager {
-    private final Transport transport;
+    private final ITransport transport;
 
-    MembershipManager(Transport transport) {
+    MembershipManager(ITransport transport) {
         this.transport = transport;
     }
 

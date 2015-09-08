@@ -7,11 +7,11 @@ apply plugin: 'signing'
 // from this Gradle script - for those who don't have Gradle plugin installed in Eclipse
 apply plugin: 'eclipse'
 
-group = 'com.taskadapter'
-version = '2.4.0'
+group = 'com.tocea'
+version = '2.4.1'
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -34,15 +34,16 @@ repositories {
 }
 
 dependencies {
-    compile ('org.apache.httpcomponents:httpclient:4.2',
-            'org.apache.httpcomponents:httpcore:4.2',
-            'org.json:json:20090211',
-            'org.slf4j:slf4j-api:1.7.1')
+    compile ('org.apache.httpcomponents:httpclient:4.5',
+            'org.apache.httpcomponents:httpcore:4.4.2',
+			'org.apache.httpcomponents:httpmime:4.5',
+            'org.json:json:20140107',
+            'org.slf4j:slf4j-api:1.7.12')
 
     testCompile(
-            'junit:junit:4.10',
+            'junit:junit:4.12',
             'org.easytesting:fest-assert:1.4',
-            'org.slf4j:slf4j-jdk14:1.7.1'
+            'org.slf4j:slf4j-jdk14:1.7.12'
     )
 }
 
@@ -64,53 +65,54 @@ signing {
 def ossUserVar = hasProperty("ossUser") ? ossUser : ""
 def ossPasswordVar = hasProperty("ossPassword") ? ossPassword : ""
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                authentication(userName: ossUserVar, password: ossPasswordVar)
-            }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-                authentication(userName: ossUserVar, password: ossPasswordVar)
-            }
-
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            pom.project {
-                name 'Redmine Java API'
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-                url 'http://github.com/taskadapter/redmine-java-api'
-                description 'Free open-source Java API for Redmine and Chiliproject bug/task management systems.' +
-                        'This project was originally a part of Task Adapter application (http://www.taskadapter.com)'
-                developers {
-                    developer {
-                        name 'Alexey Skorokhodov'
-                        email 'alskor@gmail.com'
-                    }
-                }
-                scm {
-                    connection 'scm:git:git://github.com/taskadapter/redmine-java-api.git'
-                    // "developerConnection" is required for Maven Release plugin.
-                    developerConnection 'scm:git:git@github.com:taskadapter/redmine-java-api.git'
-                    tag 'HEAD'
-                    // A publicly browsable repository. For example, via ViewCVS
-                    url 'http://github.com/taskadapter/redmine-java-api/tree/master/'
-                }
-
-                issueManagement {
-                    system 'github'
-                    url 'http://github.com/taskadapter/redmine-java-api/issues'
-                }
-            }
-        }
-    }
-}
+//
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+//                authentication(userName: ossUserVar, password: ossPasswordVar)
+//            }
+//            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+//                authentication(userName: ossUserVar, password: ossPasswordVar)
+//            }
+//
+//            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//
+//            pom.project {
+//                name 'Redmine Java API'
+//                licenses {
+//                    license {
+//                        name 'The Apache Software License, Version 2.0'
+//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                        distribution 'repo'
+//                    }
+//                }
+//                url 'http://github.com/taskadapter/redmine-java-api'
+//                description 'Free open-source Java API for Redmine and Chiliproject bug/task management systems.' +
+//                        'This project was originally a part of Task Adapter application (http://www.taskadapter.com)'
+//                developers {
+//                    developer {
+//                        name 'Alexey Skorokhodov'
+//                        email 'alskor@gmail.com'
+//                    }
+//                }
+//                scm {
+//                    connection 'scm:git:git://github.com/taskadapter/redmine-java-api.git'
+//                    // "developerConnection" is required for Maven Release plugin.
+//                    developerConnection 'scm:git:git@github.com:taskadapter/redmine-java-api.git'
+//                    tag 'HEAD'
+//                    // A publicly browsable repository. For example, via ViewCVS
+//                    url 'http://github.com/taskadapter/redmine-java-api/tree/master/'
+//                }
+//
+//                issueManagement {
+//                    system 'github'
+//                    url 'http://github.com/taskadapter/redmine-java-api/issues'
+//                }
+//            }
+//        }
+//    }
+//}
 
 task packageSources(type: Jar) {
     from sourceSets.main.allSource

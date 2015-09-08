@@ -1,7 +1,6 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
-import com.taskadapter.redmineapi.internal.Transport;
 
 import java.util.List;
 
@@ -24,9 +23,9 @@ import java.util.List;
  * @see RedmineManager
  */
 public class CustomFieldManager {
-    private final Transport transport;
+    private final ITransport transport;
 
-    CustomFieldManager(Transport transport) {
+    CustomFieldManager(ITransport transport) {
         this.transport = transport;
     }
 

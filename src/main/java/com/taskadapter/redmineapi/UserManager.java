@@ -6,7 +6,7 @@ import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
 import com.taskadapter.redmineapi.internal.ParameterMapConverter;
-import com.taskadapter.redmineapi.internal.Transport;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -30,9 +30,9 @@ import java.util.Map;
  * @see RedmineManager#getUserManager()
  */
 public class UserManager {
-    private final Transport transport;
+    private final ITransport transport;
 
-    UserManager(Transport transport) {
+    UserManager(ITransport transport) {
         this.transport = transport;
     }
 
