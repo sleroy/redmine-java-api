@@ -36,7 +36,7 @@ import java.io.IOException;
  * @see ProjectManager
  */
 public class RedmineManager implements Closeable {
-
+	
 	private final ITransport transport;
 	private final Runnable shutdownListener;
 	private final IssueManager issueManager;
@@ -46,8 +46,8 @@ public class RedmineManager implements Closeable {
 	private final MembershipManager membershipManager;
 	private final CustomFieldManager customFieldManager;
 	private final WikiManager wikiManager;
-
 	
+
 	public RedmineManager(final ITransport transport, final Runnable shutdownListener) {
 		this.transport = transport;
 		issueManager = new IssueManager(transport);
@@ -59,42 +59,45 @@ public class RedmineManager implements Closeable {
 		customFieldManager = new CustomFieldManager(transport);
 		this.shutdownListener = shutdownListener;
 	}
-
+	
 	@Override
 	public void close() throws IOException {
+		if (transport != null) {
+			transport.close();
+		}
 		if (shutdownListener != null) {
 			shutdownListener.run();
 		}
 	}
-
+	
 	public AttachmentManager getAttachmentManager() {
 		return attachmentManager;
 	}
-
+	
 	public CustomFieldManager getCustomFieldManager() {
 		return customFieldManager;
 	}
-
+	
 	public IssueManager getIssueManager() {
 		return issueManager;
 	}
-
+	
 	public MembershipManager getMembershipManager() {
 		return membershipManager;
 	}
-
+	
 	public ProjectManager getProjectManager() {
 		return projectManager;
 	}
-
+	
 	public UserManager getUserManager() {
 		return userManager;
 	}
-
+	
 	public WikiManager getWikiManager() {
 		return wikiManager;
 	}
-
+	
 	/**
 	 * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
 	 * Note that if you set objects per page to be, say, 10, and you have 20 objects on the server,
@@ -104,8 +107,8 @@ public class RedmineManager implements Closeable {
 	public void setObjectsPerPage(final int pageSize) {
 		transport.setObjectsPerPage(pageSize);
 	}
-
-
+	
+	
 	/**
 	 * This works only when the main authentication has led to Redmine Admin level user.
 	 * The given user name will be sent to the server in "X-Redmine-Switch-User" HTTP Header
