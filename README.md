@@ -1,3 +1,10 @@
+# Modifications brought in this fork.
+
+* Upgrade to HttpClient (4.5)
+* Upgrade Json api (2014/07)
+* Compatibility JRE > 7.0
+* Opened API to allow usage of HttpClient and mocking (in unit testing)
+
 # Redmine/Chiliproject Java API.
 
 * Uses Redmine's REST API (don't forget to enable it in Redmine server settings).
