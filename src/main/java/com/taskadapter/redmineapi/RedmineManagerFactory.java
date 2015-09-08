@@ -26,17 +26,17 @@ import com.taskadapter.redmineapi.internal.URIConfigurator;
  * @see RedmineManager
  */
 public final class RedmineManagerFactory {
-	
+
 	/**
 	 * Creates a non-authenticating redmine manager.
 	 *
 	 * @param uri
 	 *            redmine manager URI.
 	 */
-	public static RedmineManager createUnauthenticated(final String ur) {
+	public static RedmineManager createUnauthenticated(final String uri) {
 		return createUnauthenticated(uri, createDefaultTransportConfig());
 	}
-	
+
 	/**
 	 * Creates a non-authenticating redmine manager.
 	 *
@@ -48,7 +48,7 @@ public final class RedmineManagerFactory {
 	public static RedmineManager createUnauthenticated(final String uri, final TransportConfiguration config) {
 		return createWithUserAuth(uri, null, null, config);
 	}
-	
+
 	/**
 	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
 	 * not checked at this moment.
@@ -66,7 +66,7 @@ public final class RedmineManagerFactory {
 	public static RedmineManager createWithApiKey(final String uri, final String apiAccessKey) {
 		return createWithApiKey(uri, apiAccessKey, createDefaultTransportConfig());
 	}
-	
+
 	/**
 	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
 	 * not checked at this moment.
@@ -88,7 +88,7 @@ public final class RedmineManagerFactory {
 		return new RedmineManager(new Transport(new URIConfigurator(uri, apiAccessKey), config.client),
 				config.shutdownListener);
 	}
-	
+
 	/**
 	 * Creates a new RedmineManager with user-based authentication.
 	 *
@@ -102,7 +102,7 @@ public final class RedmineManagerFactory {
 	public static RedmineManager createWithUserAuth(final String uri, final String login, final String password) {
 		return createWithUserAuth(uri, login, password, createDefaultTransportConfig());
 	}
-	
+
 	/**
 	 * Creates a new redmine managen with user-based authentication.
 	 *
@@ -121,7 +121,7 @@ public final class RedmineManagerFactory {
 		transport.setCredentials(login, password);
 		return new RedmineManager(transport, config.shutdownListener);
 	}
-	
+
 	/**
 	 * Builds a new transport.
 	 *
@@ -134,7 +134,7 @@ public final class RedmineManagerFactory {
 	public static ITransport getNewTransport(final String _uri, final CloseableHttpClient _client) {
 		return new Transport(new URIConfigurator(_uri, null), _client);
 	}
-	
+
 	/**
 	 * Builds a new transport.
 	 *
@@ -150,7 +150,7 @@ public final class RedmineManagerFactory {
 			final CloseableHttpClient _client) {
 		return new Transport(new URIConfigurator(_redmineHost, null), _client);
 	}
-	
+
 	// private static void configureProxy(final CloseableHttpClient httpclient)
 	// {
 	// final String proxyHost = System.getProperty("http.proxyHost");
@@ -175,11 +175,11 @@ public final class RedmineManagerFactory {
 	// }
 	// }
 	// }
-	
+
 	private static TransportConfiguration createDefaultTransportConfig() {
 		return TransportConfiguration.create(HttpClientBuilder.create().build(), null);
 	}
-	
+
 	/**
 	 * Prevent construction of this object even with use of dirty tricks.
 	 */

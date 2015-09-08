@@ -1,6 +1,6 @@
 package com.taskadapter.redmineapi;
 
-import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 /**
  * Configuration of transport layer for the Redmine manager. We are leaking
@@ -30,16 +30,17 @@ public final class TransportConfiguration {
 	 * are required.
 	 * @return transport configuration for redmine manager.
 	 */
-	public static TransportConfiguration create(final HttpClient client, final Runnable shutdownListener) {
+	public static TransportConfiguration create(final CloseableHttpClient client, final Runnable shutdownListener) {
 		return new TransportConfiguration(client, shutdownListener);
 	}
-	final HttpClient client;
 	
+	final CloseableHttpClient client;
+
 	public final Runnable shutdownListener;
-	
-	private TransportConfiguration(final HttpClient client, final Runnable shutdownListener) {
+
+	private TransportConfiguration(final CloseableHttpClient client, final Runnable shutdownListener) {
 		this.client = client;
 		this.shutdownListener = shutdownListener;
 	}
-	
+
 }

@@ -1,5 +1,6 @@
 package com.taskadapter.redmineapi.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
@@ -14,7 +15,6 @@ import java.util.Map;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -250,9 +251,11 @@ public final class Transport implements ITransport {
 	private String password;
 	
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
+	private final CloseableHttpClient	client;
 	
-	public Transport(final URIConfigurator configurator, final HttpClient client) {
+	public Transport(final URIConfigurator configurator, final CloseableHttpClient client) {
 		this.configurator = configurator;
+		this.client = client;
 		final Communicator<HttpResponse> baseCommunicator = new BaseCommunicator(client);
 		authenticator = new RedmineAuthenticator<HttpResponse>(
 				baseCommunicator, CHARSET);
@@ -346,6 +349,11 @@ public final class Transport implements ITransport {
 		logger.debug(response);
 	}
 	
+	@Override
+	public void close() throws IOException {
+		client.close();
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.taskadapter.redmineapi.internal.ITransport#deleteChildId(java.lang.Class, java.lang.String, T, java.lang.Integer)
 	 */
@@ -434,7 +442,7 @@ public final class Transport implements ITransport {
 		final String response = send(http);
 		return parseResponse(response, "user", RedmineJSONParser.USER_PARSER);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.taskadapter.redmineapi.internal.ITransport#getObject(java.lang.Class, java.lang.Integer, org.apache.http.NameValuePair)
 	 */
@@ -442,7 +450,7 @@ public final class Transport implements ITransport {
 	public <T> T getObject(final Class<T> classs, final Integer key, final NameValuePair... args) throws RedmineException {
 		return getObject(classs, key.toString(), args);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see com.taskadapter.redmineapi.internal.ITransport#getObject(java.lang.Class, java.lang.String, org.apache.http.NameValuePair)
 	 */
@@ -619,7 +627,7 @@ public final class Transport implements ITransport {
 	private URIConfigurator getURIConfigurator() {
 		return configurator;
 	}
-	
+
 	private String send(final HttpRequestBase http) throws RedmineException {
 		if (onBehalfOfUser != null) {
 			http.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
