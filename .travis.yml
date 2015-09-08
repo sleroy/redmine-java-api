@@ -1,0 +1,7 @@
+language: java
+script: ./gradlew build
+jdk: oraclejdk7
+env:
+matrix:
+- TERM=dumb
+
