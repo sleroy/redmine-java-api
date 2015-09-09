@@ -3,6 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: "sonar-runner"
+apply plugin: "jacoco"
 
 // 'eclipse' plugin is used to generate native project files for Eclipse
 // from this Gradle script - for those who don't have Gradle plugin installed in Eclipse
@@ -17,8 +18,30 @@ def sonarHostURL = hasProperty("sonarHostURL") ? sonarHostURL :  "http://192.168
 def sonarUser = hasProperty("sonarUser") ? sonarUser : "sonar"
 def sonarPwd = hasProperty("sonarPwd") ? sonarPwd : "sonar"
 
-test { ignoreFailures true }
 
+
+
+jacoco { toolVersion = '0.7.1.201405082137' }
+
+test {
+	ignoreFailures true
+	
+	// set heap size for the test JVM(s)
+	minHeapSize = "128m"
+	maxHeapSize = "512m"
+	
+	// set JVM arguments for the test JVM(s)
+	jvmArgs '-XX:MaxPermSize=256m'
+	
+}
+
+jacocoTestReport {
+	reports {
+		html.enabled = true
+		xml.enabled = true
+		csv.enabled = false
+	}
+}
 sonarRunner {
 	// toolVersion = "2.4"
 	

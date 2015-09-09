@@ -51,14 +51,14 @@ public class AttachmentManager {
 			e = e.getCause();
 		}
 	}
-	
+
 	private final ITransport transport;
-	
-	
+
+
 	AttachmentManager(final ITransport _transport) {
 		transport = _transport;
 	}
-	
+
 	/**
 	 *
 	 * @param issueId database ID of the Issue
@@ -75,7 +75,7 @@ public class AttachmentManager {
 		transport.updateObject(issue);
 		return attach;
 	}
-	
+
 	/**
 	 * Downloads the content of an {@link com.taskadapter.redmineapi.bean.Attachment} from the Redmine server.
 	 *
@@ -94,13 +94,13 @@ public class AttachmentManager {
 		}
 		return baos.toByteArray();
 	}
-	
+
 	public void downloadAttachmentContent(final Attachment issueAttachment,
 			final OutputStream stream) throws RedmineException {
 		transport.download(issueAttachment.getContentURL(),
 				new CopyBytesHandler(stream));
 	}
-	
+
 	/**
 	 * Delivers an {@link com.taskadapter.redmineapi.bean.Attachment} by its ID.
 	 *
@@ -113,7 +113,7 @@ public class AttachmentManager {
 	public Attachment getAttachmentById(final int attachmentID) throws RedmineException {
 		return transport.getObject(Attachment.class, attachmentID);
 	}
-	
+
 	/**
 	 * Uploads an attachment.
 	 *
@@ -131,12 +131,12 @@ public class AttachmentManager {
 			throws RedmineException, IOException {
 		final InputStream is = new FileInputStream(content);
 		try {
-			return uploadAttachment(content.getName(), contentType, is);
+			return uploadAttachment(content.getName(), contentType, is, content.length());
 		} finally {
 			is.close();
 		}
 	}
-	
+
 	/**
 	 * Uploads an attachment.
 	 *
@@ -156,7 +156,7 @@ public class AttachmentManager {
 			final byte[] content) throws RedmineException, IOException {
 		final InputStream is = new ByteArrayInputStream(content);
 		try {
-			return uploadAttachment(fileName, contentType, is);
+			return uploadAttachment(fileName, contentType, is, content.length);
 		} finally {
 			try {
 				is.close();
@@ -165,7 +165,7 @@ public class AttachmentManager {
 			}
 		}
 	}
-	
+
 	/**
 	 * Uploads an attachment.
 	 *
@@ -175,8 +175,10 @@ public class AttachmentManager {
 	 *            content type of the attachment.
 	 * @param content
 	 *            attachment content stream.
+	 * @param _size
 	 * @return attachment content.
-	 * @throws RedmineException if something goes wrong.
+	 * @throws RedmineException
+	 *             if something goes wrong.
 	 * @throws IOException
 	 *             if input cannot be read. This exception cannot be thrown yet
 	 *             (I am not sure if http client can distinguish "network"
@@ -184,12 +186,13 @@ public class AttachmentManager {
 	 *             reading errors and transport errors.
 	 */
 	public Attachment uploadAttachment(final String fileName, final String contentType,
-			final InputStream content) throws RedmineException, IOException {
+			final InputStream content,
+			final long _size) throws RedmineException, IOException {
 		final InputStream wrapper = new MarkedInputStream(content,
 				"uploadStream");
 		final String token;
 		try {
-			token = transport.upload(wrapper);
+			token = transport.upload(wrapper, _size);
 			final Attachment result = AttachmentFactory.create();
 			result.setToken(token);
 			result.setContentType(contentType);
@@ -200,5 +203,5 @@ public class AttachmentManager {
 			throw e;
 		}
 	}
-	
+
 }
