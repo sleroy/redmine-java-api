@@ -2,13 +2,39 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
+apply plugin: "sonar-runner"
 
 // 'eclipse' plugin is used to generate native project files for Eclipse
 // from this Gradle script - for those who don't have Gradle plugin installed in Eclipse
 apply plugin: 'eclipse'
 
-group = 'com.tocea'
+group = 'com.tocea.redmine'
 version = '2.5.0-SNAPSHOT'
+
+// Default Sonar properties
+def sonarJdbcURL = hasProperty("sonarJdbcURL") ? sonarJdbcURL :"jdbc:mysql://192.168.1.1:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance"
+def sonarHostURL = hasProperty("sonarHostURL") ? sonarHostURL :  "http://192.168.1.1:9000"
+def sonarUser = hasProperty("sonarUser") ? sonarUser : "sonar"
+def sonarPwd = hasProperty("sonarPwd") ? sonarPwd : "sonar"
+
+
+sonarRunner {
+	// toolVersion = "2.4"
+	
+	// Fine grained control over the runner process
+	//    forkOptions {
+	//        maxHeapSize = '1024m'
+	//    }
+	sonarProperties {
+		property "sonar.host.url", sonarHostURL// "http://192.168.1.1:9000"
+		property "sonar.jdbc.url", sonarJdbcURL// "jdbc:mysql://192.168.1.1:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance"
+		property "sonar.jdbc.driverClassName", "com.mysql.jdbc.Driver"
+		property "sonar.jdbc.username",sonarUser// "sonar"
+		property "sonar.jdbc.password", sonarPwd//"sonar"
+	}
+}
+
+
 
 //nexusServer='oss.sonatype.org'
 ext.nexusServer='zeus.tocea:8081/nexus'
@@ -72,7 +98,7 @@ def ossPasswordVar = hasProperty("ossPassword") ? ossPassword : ""
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: "http://$nexusServer/content/repositories/releases") {
+            repository(url: "http://$nexusServer/content/repositories/redminejavaapi") {
                 authentication(userName: ossUserVar, password: ossPasswordVar)
             }
             snapshotRepository(url: "http://$nexusServer/content/repositories/snapshots") {
