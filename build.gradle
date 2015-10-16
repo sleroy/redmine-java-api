@@ -13,8 +13,8 @@ group = 'com.tocea.redmine'
 version = '2.5.0-SNAPSHOT'
 
 // Default Sonar properties
-def sonarJdbcURL = hasProperty("sonarJdbcURL") ? sonarJdbcURL :"jdbc:mysql://192.168.1.1:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance"
-def sonarHostURL = hasProperty("sonarHostURL") ? sonarHostURL :  "http://192.168.1.1:9000"
+def sonarJdbcURL = hasProperty("sonarJdbcURL") ? sonarJdbcURL :"jdbc:mysql://zeus:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance"
+def sonarHostURL = hasProperty("sonarHostURL") ? sonarHostURL :  "http://zeus:9000"
 def sonarUser = hasProperty("sonarUser") ? sonarUser : "sonar"
 def sonarPwd = hasProperty("sonarPwd") ? sonarPwd : "sonar"
 
@@ -50,8 +50,8 @@ sonarRunner {
 	//        maxHeapSize = '1024m'
 	//    }
 	sonarProperties {
-		property "sonar.host.url", sonarHostURL// "http://192.168.1.1:9000"
-		property "sonar.jdbc.url", sonarJdbcURL// "jdbc:mysql://192.168.1.1:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance"
+		property "sonar.host.url", sonarHostURL// "http://zeus:9000"
+		property "sonar.jdbc.url", sonarJdbcURL// "jdbc:mysql://zeus:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance"
 		property "sonar.jdbc.driverClassName", "com.mysql.jdbc.Driver"
 		property "sonar.jdbc.username",sonarUser// "sonar"
 		property "sonar.jdbc.password", sonarPwd//"sonar"
